@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+a{color:#0d6ab8}
+a:hover{color:#2b8ad0}
+</style>
+</helmet>
+<div style="font-family:'Pretendard Variable','Noto Sans KR',sans-serif;background:#f4f6f9;color:#1e2124;min-height:100vh;">
+
+  <div style="background:#eef2f7;border-bottom:1px solid #e3ebf4;">
+    <div style="max-width:1680px;width:100%;margin:0 auto;padding:6px 24px;display:flex;align-items:center;gap:8px;font-size:13px;color:#586374;">
+      <span style="width:14px;height:14px;border-radius:50%;background:#0d6ab8;display:inline-block;"></span>
+      <span>경상북도교육청 · 교육데이터 분석·활용 플랫폼</span>
+    </div>
+  </div>
+
+  <div style="background:#ffffff;border-bottom:1px solid #e3ebf4;">
+    <div style="height:4px;display:flex;">
+      <div style="flex:1;background:#0d6ab8;"></div>
+      <div style="flex:1;background:#83bd3f;"></div>
+      <div style="flex:1;background:#f28c28;"></div>
+    </div>
+    <div style="max-width:1680px;width:100%;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:8px;background:#0d6ab8;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;">경북</div>
+        <div style="font-size:19px;font-weight:700;color:#1e2124;">기초학력 미달 예측모델 분석</div>
+      </div>
+      <div style="font-size:13px;color:#586374;">운영기관: 한국교육학술정보원(KERIS) 교육데이터통계과</div>
+    </div>
+  </div>
+
+  <div style="max-width:1680px;width:100%;margin:0 auto;padding:28px 24px 64px;">
+
+    <div style="font-size:13px;color:#8592a3;margin-bottom:10px;">홈 &gt; 기초학력 위험 현황 및 영향요인 분석</div>
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+      <div>
+        <h1 style="font-size:24px;font-weight:700;margin:0 0 8px;color:#1e2124;">{{ pageTitle }}</h1>
+        <p style="font-size:15px;line-height:1.5;color:#586374;margin:0;max-width:760px;">{{ pageSubtitle }}</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="background:#eef2f7;color:#0d6ab8;font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px;">매월 갱신</span>
+        <span style="background:#eef2f7;color:#0d6ab8;font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px;">기준일 2026-09-01</span>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:16px 20px;margin-bottom:24px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:13px;color:#586374;font-weight:500;">교육지원청</span>
+        <select onchange="{{ onRegionChange }}" style="height:40px;border:1px solid #e3ebf4;border-radius:8px;padding:0 12px;font-size:14px;color:#1e2124;background:#fff;min-width:140px;">
+          <sc-for list="{{ regions }}" as="r" hint-placeholder-count="11">
+            <option value="{{ r.label }}" selected="{{ r.selected }}">{{ r.label }}</option>
+          </sc-for>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:#586374;font-weight:500;margin-right:2px;">학교급</span>
+        <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="4">
+          <button onclick="{{ lv.onClick }}" style="height:40px;padding:0 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid {{ lv.border }};background:{{ lv.bg }};color:{{ lv.color }};white-space:nowrap;flex-shrink:0;">{{ lv.name }}</button>
+        </sc-for>
+      </div>
+      <button onclick="{{ onReset }}" style="height:40px;padding:0 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid #e3ebf4;background:#fff;color:#586374;white-space:nowrap;">필터 초기화</button>
+      <div style="margin-left:auto;font-size:13px;color:#8592a3;">표시 중: 필터에 해당하는 학교 {{ filteredCount }}건</div>
+    </div>
+
+    <div style="font-size:15px;font-weight:700;color:#1e2124;margin-bottom:10px;">핵심 현황 · {{ filterDesc }}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:24px;">
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:24px;">
+        <div style="font-size:14px;color:#586374;margin-bottom:10px;">분석대상 학생수</div>
+        <div style="font-size:26px;font-weight:700;color:#1e2124;font-variant-numeric:tabular-nums;">{{ kpiTotalStudents }}명</div>
+        <div style="font-size:13px;color:#8592a3;margin-top:6px;">{{ filterDesc }} · {{ filteredCount }}개교</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:24px;">
+        <div style="font-size:14px;color:#586374;margin-bottom:10px;">기초학력 미달 위험군</div>
+        <div style="font-size:26px;font-weight:700;color:#de3412;font-variant-numeric:tabular-nums;">{{ kpiAtRisk }}명 ({{ kpiRiskRate }}%)</div>
+        <div style="font-size:13px;color:{{ kpiYoyColor }};margin-top:6px;">전년대비 {{ kpiYoyLabel }}</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:24px;">
+        <div style="font-size:14px;color:#586374;margin-bottom:10px;">전년대비 미달 학생 비율</div>
+        <div style="font-size:26px;font-weight:700;color:#9e6a00;font-variant-numeric:tabular-nums;">{{ kpiYoyLabel }}p</div>
+        <div style="font-size:13px;color:#8592a3;margin-top:6px;">{{ kpiPrevRate }}% → {{ kpiRiskRate }}%</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.3fr 1.4fr;gap:14px;margin-bottom:24px;">
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:24px;overflow-x:auto;min-width:0;">
+        <div style="margin-bottom:8px;">
+          <div style="font-size:17.5px;font-weight:700;">학교별 기초학력 위험 예측</div>
+          <div style="font-size:12.5px;color:#8592a3;margin-top:4px;">가나다순 · 위험등급 "위험"은 위험비율 12% 이상 학교 · 행을 클릭하면 위 프로파일이 갱신됩니다</div>
+        </div>
+        <div style="margin-top:10px;">
+          <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,0.55fr) minmax(0,0.75fr) minmax(0,0.7fr) minmax(0,1.15fr);border-bottom:1px solid #e3ebf4;">
+            <div style="text-align:left;padding:8px 6px;font-size:12px;color:#586374;font-weight:500;">학교명</div>
+            <div style="text-align:center;padding:8px 6px;font-size:12px;color:#586374;font-weight:500;">위험등급</div>
+            <div style="text-align:right;padding:8px 6px;font-size:12px;color:#586374;font-weight:500;">위험비율</div>
+            <div style="text-align:right;padding:8px 6px;font-size:12px;color:#586374;font-weight:500;white-space:nowrap;">위험학생수</div>
+            <div style="text-align:right;padding:8px 6px;font-size:12px;color:#586374;font-weight:500;white-space:nowrap;">예측 위험비율</div>
+          </div>
+          <div style="max-height:600px;overflow-y:auto;">
+            <sc-for list="{{ filteredSchools }}" as="s" hint-placeholder-count="10">
+              <div onclick="{{ s.onSelect }}" style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,0.55fr) minmax(0,0.75fr) minmax(0,0.7fr) minmax(0,1.15fr);border-bottom:1px solid #f0f3f7;background:{{ s.rowBg }};box-shadow:{{ s.selectedShadow }};cursor:pointer;">
+                <div style="padding:9px 6px;min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:#1e2124;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ s.name }}</div>
+                  <div style="font-size:11px;color:#8592a3;margin-top:1px;">{{ s.region }} · {{ s.level }}</div>
+                </div>
+                <div style="padding:9px 4px;display:flex;align-items:center;justify-content:center;">
+                  <span style="background:{{ s.riskGradeBg }};color:{{ s.riskGradeColor }};font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:999px;white-space:nowrap;">{{ s.riskGradeLabel }}</span>
+                </div>
+                <div style="padding:9px 6px;font-size:13px;font-weight:700;color:{{ s.rateColor }};text-align:right;font-variant-numeric:tabular-nums;">{{ s.riskRate }}%</div>
+                <div style="padding:9px 6px;font-size:13px;color:#586374;text-align:right;font-variant-numeric:tabular-nums;">{{ s.atRisk }}명</div>
+                <div style="padding:9px 6px;font-size:13px;text-align:right;white-space:nowrap;">
+                  <span style="font-weight:700;color:#586374;font-variant-numeric:tabular-nums;">{{ s.predictedRiskRate }}%</span>
+                  <span style="font-size:11.5px;color:{{ s.changeColor }};margin-left:3px;">({{ s.changeLabel }})</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;min-width:0;">
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:28px;min-width:0;">
+        <div style="font-size:16px;font-weight:700;margin-bottom:4px;">기초학력 미달 위험 학생 수 추이 예측</div>
+        <div style="font-size:12.5px;color:#8592a3;margin-bottom:14px;">{{ entityLabel }} · 점선은 향후 예측 연도</div>
+        <div style="position:relative;width:100%;">
+          <svg viewBox="0 0 620 200" style="width:100%;height:auto;display:block;">
+            <line x1="40" y1="20" x2="40" y2="170" stroke="#e3ebf4" stroke-width="1"></line>
+            <line x1="40" y1="170" x2="600" y2="170" stroke="#e3ebf4" stroke-width="1"></line>
+            <path d="{{ trendSolidPath }}" fill="none" stroke="#0d6ab8" stroke-width="2.5"></path>
+            <path d="{{ trendDashedPath }}" fill="none" stroke="#0d6ab8" stroke-width="2.5" stroke-dasharray="6 5"></path>
+            <sc-for list="{{ trendPoints }}" as="pt" hint-placeholder-count="8">
+              <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="4" fill="{{ pt.fill }}" stroke="#0d6ab8" stroke-width="2"></circle>
+            </sc-for>
+          </svg>
+          <sc-for list="{{ trendYTicks }}" as="yt" hint-placeholder-count="3">
+            <div style="position:absolute;right:95%;top:{{ yt.pct }}%;transform:translateY(-50%);padding-right:4px;text-align:right;font-size:10.5px;color:#8592a3;white-space:nowrap;">{{ yt.label }}</div>
+          </sc-for>
+          <sc-for list="{{ trendPoints }}" as="pt2" hint-placeholder-count="8">
+            <div style="position:absolute;left:{{ pt2.xPct }}%;top:98%;transform:translateX(-50%);font-size:12px;font-weight:500;color:#586374;white-space:nowrap;">{{ pt2.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:28px;min-width:0;">
+        <div style="font-size:16px;font-weight:700;margin-bottom:4px;">주요 위험요인 프로파일</div>
+        <div style="font-size:12.5px;color:#8592a3;margin-bottom:14px;">{{ entityLabel }} · 위험요인별 상대 지표 (0~100 표준화)</div>
+        <div style="position:relative;width:100%;max-width:300px;margin:0 auto;">
+          <svg viewBox="0 0 240 240" style="width:100%;height:auto;display:block;">
+            <sc-for list="{{ radarRings }}" as="rg" hint-placeholder-count="3">
+              <polygon points="{{ rg.points }}" fill="none" stroke="#e3ebf4" stroke-width="1"></polygon>
+            </sc-for>
+            <sc-for list="{{ radarAxes }}" as="ax" hint-placeholder-count="6">
+              <line x1="120" y1="120" x2="{{ ax.x }}" y2="{{ ax.y }}" stroke="#e3ebf4" stroke-width="1"></line>
+            </sc-for>
+            <polygon points="{{ baselinePolygonPoints }}" fill="none" stroke="#8592a3" stroke-width="1.5" stroke-dasharray="4 4"></polygon>
+            <polygon points="{{ radarPolygonPoints }}" fill="rgba(13,106,184,0.18)" stroke="#0d6ab8" stroke-width="2"></polygon>
+            <sc-for list="{{ radarPoints }}" as="rp" hint-placeholder-count="6">
+              <circle cx="{{ rp.x }}" cy="{{ rp.y }}" r="3.5" fill="#0d6ab8"></circle>
+            </sc-for>
+          </svg>
+          <sc-for list="{{ radarLabels }}" as="rl" hint-placeholder-count="6">
+            <div style="position:absolute;left:{{ rl.xPct }}%;top:{{ rl.yPct }}%;transform:translate(-50%,-50%);font-size:11px;color:#586374;white-space:nowrap;text-align:center;">{{ rl.label }}<br><span style="font-weight:700;color:#1e2124;">{{ rl.value }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:16px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#586374;"><span style="width:16px;height:2.5px;background:#0d6ab8;display:inline-block;"></span>{{ entityLabel }}</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#586374;"><span style="width:16px;height:0;border-top:2px dashed #8592a3;display:inline-block;"></span>경북 평균</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.05);padding:28px;min-width:0;">
+        <div style="font-size:16px;font-weight:700;margin-bottom:4px;">학생 위험군 분포</div>
+        <div style="font-size:12.5px;color:#8592a3;margin-bottom:14px;">{{ entityLabel }}</div>
+        <div style="position:relative;width:200px;height:200px;margin:4px auto 0;">
+          <svg viewBox="0 0 180 180" style="width:200px;height:200px;display:block;">
+            <g transform="rotate(-90 90 90)">
+              <sc-for list="{{ donut }}" as="d" hint-placeholder-count="3">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="{{ d.color }}" stroke-width="22" stroke-dasharray="{{ d.dasharray }}" stroke-dashoffset="{{ d.dashoffset }}"></circle>
+              </sc-for>
+            </g>
+          </svg>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;">
+            <div style="font-size:19px;font-weight:700;color:#1e2124;font-variant-numeric:tabular-nums;">{{ donutTotalLabel }}</div>
+            <div style="font-size:12px;color:#8592a3;">전체 학생</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px;">
+          <sc-for list="{{ donut }}" as="d2" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;">
+              <span style="width:10px;height:10px;border-radius:50%;background:{{ d2.color }};display:inline-block;"></span>
+              <span style="color:#586374;flex:1;white-space:nowrap;">{{ d2.label }}</span>
+              <span style="font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ d2.value }}% ({{ d2.count }}명)</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="background:#f0f3f7;border-top:1px solid #e3ebf4;padding:24px;">
+    <div style="max-width:1680px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;gap:6px;">
+        <div style="width:36px;height:6px;background:#0d6ab8;border-radius:3px;"></div>
+        <div style="width:36px;height:6px;background:#83bd3f;border-radius:3px;"></div>
+        <div style="width:36px;height:6px;background:#f28c28;border-radius:3px;"></div>
+      </div>
+      <div style="font-size:13px;color:#8592a3;">© 2026 경상북도교육청 · 한국교육학술정보원(KERIS). 본 대시보드의 데이터는 예시를 위한 가상 데이터입니다.</div>
+      <div style="background:#fff;border:1px solid #e3ebf4;border-radius:6px;padding:6px 14px;font-size:13px;color:#586374;">교육데이터통계과 운영</div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1680,&quot;height&quot;:1400},&quot;highlightHighRisk&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;학교 목록&quot;},&quot;showForecast&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;예측 추이 차트&quot;}}">
+
+const CIRC = 2 * Math.PI * 70;
+const FACTOR_POOL = ['직전학기 성취도 하락','스마트기기 사용시간 과다','수면 부족','결석일수 증가','방과후 미참여','가정환경 요인'];
+const FACTOR_SHORT = { '직전학기 성취도 하락':'성취도 하락', '스마트기기 사용시간 과다':'스마트폰 기기 사용', '수면 부족':'수면 부족', '결석일수 증가':'결석 증가', '방과후 미참여':'방과후 미참여', '가정환경 요인':'가정환경' };
+
+class Component extends DCLogic {
+  state = { region: '전체', level: '전체', school: null, schoolExplicit: false };
+
+  schoolsData = [
+    { name:'포항중앙초등학교', region:'포항', level:'초', students:512, riskRate:7.8, yoy:1.2, factor:'수면 부족' },
+    { name:'포항동해중학교', region:'포항', level:'중', students:438, riskRate:9.1, yoy:0.8, factor:'스마트기기 사용시간 과다' },
+    { name:'포항영일고등학교', region:'포항', level:'고', students:589, riskRate:8.6, yoy:-0.2, factor:'직전학기 성취도 하락' },
+    { name:'경주계림초등학교', region:'경주', level:'초', students:345, riskRate:6.5, yoy:0.4, factor:'수면 부족' },
+    { name:'경주문화중학교', region:'경주', level:'중', students:402, riskRate:9.7, yoy:1.0, factor:'방과후 미참여' },
+    { name:'경주불국고등학교', region:'경주', level:'고', students:601, riskRate:8.4, yoy:-0.3, factor:'직전학기 성취도 하락' },
+    { name:'김천직지초등학교', region:'김천', level:'초', students:289, riskRate:10.2, yoy:1.9, factor:'결석일수 증가' },
+    { name:'김천율곡중학교', region:'김천', level:'중', students:356, riskRate:8.9, yoy:0.6, factor:'스마트기기 사용시간 과다' },
+    { name:'김천고등학교', region:'김천', level:'고', students:412, riskRate:7.5, yoy:-0.4, factor:'가정환경 요인' },
+    { name:'안동서부초등학교', region:'안동', level:'초', students:298, riskRate:9.3, yoy:1.1, factor:'수면 부족' },
+    { name:'안동퇴계중학교', region:'안동', level:'중', students:356, riskRate:11.5, yoy:2.4, factor:'스마트기기 사용시간 과다' },
+    { name:'안동풍산고등학교', region:'안동', level:'고', students:402, riskRate:9.8, yoy:1.1, factor:'방과후 미참여' },
+    { name:'구미선산초등학교', region:'구미', level:'초', students:478, riskRate:5.9, yoy:-0.5, factor:'수면 부족' },
+    { name:'구미인동중학교', region:'구미', level:'중', students:421, riskRate:6.7, yoy:0.4, factor:'직전학기 성취도 하락' },
+    { name:'구미공업고등학교', region:'구미', level:'고', students:389, riskRate:7.2, yoy:0.3, factor:'방과후 미참여' },
+    { name:'영주풍기초등학교', region:'영주', level:'초', students:210, riskRate:11.8, yoy:1.4, factor:'결석일수 증가' },
+    { name:'영주부석중학교', region:'영주', level:'중', students:198, riskRate:14.2, yoy:3.1, factor:'결석일수 증가' },
+    { name:'영주소백고등학교', region:'영주', level:'고', students:233, riskRate:12.6, yoy:2.0, factor:'가정환경 요인' },
+    { name:'상주낙동초등학교', region:'상주', level:'초', students:244, riskRate:12.8, yoy:1.6, factor:'스마트기기 사용시간 과다' },
+    { name:'상주중앙중학교', region:'상주', level:'중', students:267, riskRate:10.5, yoy:1.2, factor:'결석일수 증가' },
+    { name:'상주공업고등학교', region:'상주', level:'고', students:298, riskRate:9.4, yoy:0.5, factor:'방과후 미참여' },
+    { name:'경산중앙초등학교', region:'경산', level:'초', students:356, riskRate:6.1, yoy:-0.3, factor:'수면 부족' },
+    { name:'경산진량중학교', region:'경산', level:'중', students:512, riskRate:6.4, yoy:-0.2, factor:'수면 부족' },
+    { name:'경산고등학교', region:'경산', level:'고', students:445, riskRate:7.0, yoy:0.1, factor:'직전학기 성취도 하락' },
+    { name:'칠곡약목초등학교', region:'칠곡', level:'초', students:189, riskRate:10.9, yoy:1.3, factor:'결석일수 증가' },
+    { name:'칠곡중학교', region:'칠곡', level:'중', students:234, riskRate:9.5, yoy:0.7, factor:'스마트기기 사용시간 과다' },
+    { name:'칠곡왜관고등학교', region:'칠곡', level:'고', students:367, riskRate:9.9, yoy:0.9, factor:'방과후 미참여' },
+    { name:'문경신북초등학교', region:'문경', level:'초', students:156, riskRate:15.4, yoy:2.8, factor:'결석일수 증가' },
+    { name:'문경중학교', region:'문경', level:'중', students:178, riskRate:13.1, yoy:2.2, factor:'가정환경 요인' },
+    { name:'문경산업고등학교', region:'문경', level:'고', students:201, riskRate:12.0, yoy:1.7, factor:'방과후 미참여' },
+  ];
+
+  trendYearLabels = ["'21","'22","'23","'24","'25","'26","'27","'28"];
+
+  onRegionChange = (e) => this.setState({ region: e.target.value, school: null, schoolExplicit: false });
+  setLevel = (lv) => this.setState({ level: lv, school: null, schoolExplicit: false });
+  selectSchool = (name) => this.setState({ school: name, schoolExplicit: true });
+  onReset = () => this.setState({ region: '전체', level: '전체', school: null, schoolExplicit: false });
+
+  hashStr(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 100000;
+    return h;
+  }
+
+  computeTiers(s) {
+    const atRisk = Math.round(s.students * s.riskRate / 100);
+    const high = Math.round(atRisk * 0.4);
+    const mid = atRisk - high;
+    const low = s.students - atRisk;
+    return { low, mid, high };
+  }
+
+  computeRadarValues(s) {
+    return FACTOR_POOL.map((f) => {
+      let v = 30 + (this.hashStr(s.name + f) % 40);
+      if (f === s.factor) v = 70 + (this.hashStr(s.name + f + 'top') % 26);
+      return v;
+    });
+  }
+
+  averageRadarValues(schools) {
+    if (!schools.length) return FACTOR_POOL.map(() => 0);
+    const all = schools.map((s) => this.computeRadarValues(s));
+    return FACTOR_POOL.map((_, i) => Math.round(all.reduce((sum, a) => sum + a[i], 0) / all.length));
+  }
+
+  renderVals() {
+    const highlight = this.props.highlightHighRisk ?? true;
+    const showForecast = this.props.showForecast ?? true;
+
+    const regions = ['전체','포항','경주','김천','안동','구미','영주','상주','경산','칠곡','문경'].map(r => ({
+      label: r, selected: r === this.state.region,
+    }));
+
+    const levels = ['전체','초','중','고'].map(lv => {
+      const active = lv === this.state.level;
+      return {
+        name: lv, onClick: () => this.setLevel(lv),
+        bg: active ? '#0d6ab8' : '#fff',
+        color: active ? '#fff' : '#586374',
+        border: active ? '#0d6ab8' : '#e3ebf4',
+      };
+    });
+
+    let filtered = this.schoolsData.filter(s =>
+      (this.state.region === '전체' || s.region === this.state.region) &&
+      (this.state.level === '전체' || s.level === this.state.level)
+    );
+    filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+
+    const explicitObj = this.state.schoolExplicit ? filtered.find(s => s.name === this.state.school) : null;
+    const selectedName = explicitObj ? explicitObj.name : null;
+
+    let filteredSchools = filtered.map(s => {
+      const isHigh = highlight && s.riskRate >= 12;
+      const isSelected = s.name === selectedName;
+      const tc = this.computeTiers(s);
+      const atRisk = tc.mid + tc.high;
+      const displayRiskRate = (atRisk / s.students * 100).toFixed(1);
+      return {
+        ...s,
+        atRisk,
+        riskRate: displayRiskRate,
+        rowBg: isSelected ? '#eaf3fb' : 'transparent',
+        isHigh,
+        riskGradeLabel: isHigh ? '위험' : '안정',
+        riskGradeBg: isHigh ? '#fdecea' : '#eaf6ec',
+        riskGradeColor: isHigh ? '#de3412' : '#228738',
+        selectedShadow: isSelected ? 'inset 0 0 0 2px #0d6ab8' : 'none',
+        rateColor: isHigh ? '#de3412' : '#1e2124',
+        yoyColor: s.yoy >= 0 ? '#de3412' : '#228738',
+        yoyLabel: (s.yoy >= 0 ? '▲ ' : '▼ ') + Math.abs(s.yoy).toFixed(1) + '%p',
+        mainFactor: s.factor,
+        onSelect: () => this.selectSchool(s.name),
+      };
+    });
+
+    const filterDesc = (this.state.region === '전체' ? '경북 전체' : this.state.region)
+      + (this.state.level === '전체' ? '' : ' · ' + this.state.level + '등학교');
+
+    const entityLabel = explicitObj ? explicitObj.name : filterDesc;
+    const entitySchools = explicitObj ? [explicitObj] : (filtered.length ? filtered : this.schoolsData);
+    const entityAtRisk = entitySchools.reduce((sum, s) => { const tc = this.computeTiers(s); return sum + tc.mid + tc.high; }, 0);
+
+    const totalStudents = filteredSchools.reduce((sum, s) => sum + s.students, 0);
+    const totalAtRisk = filteredSchools.reduce((sum, s) => sum + s.atRisk, 0);
+    const riskRatePct = totalStudents ? (totalAtRisk / totalStudents * 100) : 0;
+    const avgYoy = filteredSchools.length ? (filteredSchools.reduce((sum, s) => sum + s.yoy, 0) / filteredSchools.length) : 0;
+    const prevRate = riskRatePct - avgYoy;
+
+    const trendBase = entityAtRisk || 1;
+    const entityYoy = explicitObj ? explicitObj.yoy : avgYoy;
+    const growthRate = 1 + (entityYoy / 100);
+    const seed = this.hashStr(this.state.region + this.state.level);
+    const amplitude = 0.12 + (seed % 20) / 100;
+    const phase = (seed % 628) / 100;
+    const freq = 1.1 + (seed % 50) / 100;
+    filteredSchools = filteredSchools.map(s => {
+      let rawChange = Math.round(s.atRisk * (s.yoy / 100) * 3);
+      if (rawChange === 0 && s.yoy !== 0) rawChange = s.yoy > 0 ? 1 : -1;
+      let predictedAtRisk = Math.max(0, s.atRisk + rawChange);
+      const predictedRiskRate = (predictedAtRisk / s.students * 100).toFixed(1);
+      const pctChange = (parseFloat(predictedRiskRate) - parseFloat(s.riskRate));
+      return {
+        ...s,
+        predictedRiskRate,
+        changeLabel: (pctChange >= 0 ? '▲' : '▼') + Math.abs(pctChange).toFixed(1) + '%p',
+        changeColor: pctChange > 0 ? '#de3412' : (pctChange < 0 ? '#228738' : '#586374'),
+      };
+    });
+
+    const trendValues = this.trendYearLabels.map((label, i) => {
+      const wave = (i >= 4) ? 0 : amplitude * Math.sin(freq * i + phase);
+      const v = Math.max(0, Math.round(trendBase * Math.pow(growthRate, i - 5) * (1 + wave)));
+      return { label, v, forecast: i > 5 };
+    });
+    const min = Math.min(...trendValues.map(t => t.v));
+    const max = Math.max(...trendValues.map(t => t.v));
+    const range = (max - min) || 1;
+    const plotW = 560, plotH = 150, padL = 40, padT = 20;
+    const pts = trendValues.map((t, i) => ({
+      x: padL + i * (plotW / (trendValues.length - 1)),
+      y: padT + (1 - (t.v - min) / range) * plotH,
+      label: t.label,
+      forecast: !!t.forecast,
+      fill: t.forecast ? '#fff' : '#0d6ab8',
+    }));
+    const pts2 = pts.map(p => ({ ...p, xPct: (p.x / 620) * 100 }));
+    const solidPts = pts.slice(0, 6);
+    const forecastPts = pts.slice(5);
+    const toPath = (arr) => arr.map((p, i) => (i === 0 ? 'M' : 'L') + p.x + ',' + p.y.toFixed(2)).join(' ');
+    const trendYTicks = [max, min + range / 2].map(v => ({
+      label: Math.round(v).toLocaleString() + '명',
+      pct: ((padT + (1 - (v - min) / range) * plotH) / 200) * 100,
+    }));
+
+    const cx = 120, cy = 120, maxR = 62;
+    const angleFor = (i) => (-90 + i * 60) * (Math.PI / 180);
+    const entityValues = this.averageRadarValues(entitySchools);
+    const baselineValues = this.averageRadarValues(this.schoolsData);
+    const radarPoints = entityValues.map((v, i) => {
+      const a = angleFor(i);
+      const r = (v / 100) * maxR;
+      return { x: (cx + r * Math.cos(a)).toFixed(1), y: (cy + r * Math.sin(a)).toFixed(1) };
+    });
+    const radarPolygonPoints = radarPoints.map(p => `${p.x},${p.y}`).join(' ');
+    const baselinePolygonPoints = baselineValues.map((v, i) => {
+      const a = angleFor(i);
+      const r = (v / 100) * maxR;
+      return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+    }).join(' ');
+    const radarAxes = FACTOR_POOL.map((f, i) => {
+      const a = angleFor(i);
+      return { x: (cx + maxR * Math.cos(a)).toFixed(1), y: (cy + maxR * Math.sin(a)).toFixed(1) };
+    });
+    const radarRings = [0.33, 0.66, 1].map(frac => {
+      const pts6 = FACTOR_POOL.map((f, i) => {
+        const a = angleFor(i);
+        const r = maxR * frac;
+        return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+      });
+      return { points: pts6.join(' ') };
+    });
+    const radarLabels = FACTOR_POOL.map((f, i) => {
+      const a = angleFor(i);
+      const r = maxR + 40;
+      const x = cx + r * Math.cos(a);
+      const y = cy + r * Math.sin(a);
+      return { label: FACTOR_SHORT[f], value: entityValues[i], xPct: (x / 240) * 100, yPct: (y / 240) * 100 };
+    });
+
+    const entityTiers = entitySchools.reduce((acc, s) => {
+      const tc = this.computeTiers(s);
+      return { low: acc.low + tc.low, mid: acc.mid + tc.mid, high: acc.high + tc.high };
+    }, { low: 0, mid: 0, high: 0 });
+    const studentCount = entitySchools.reduce((sum, s) => sum + s.students, 0) || 1;
+    const donutData = [
+      { label:'저위험', count: entityTiers.low, color:'#4aa3dc' },
+      { label:'중위험', count: entityTiers.mid, color:'#9e6a00' },
+      { label:'고위험', count: entityTiers.high, color:'#de3412' },
+    ].map(d => ({ ...d, value: Math.round((d.count / studentCount) * 100) }));
+    const donut = (() => {
+      let offset = 0;
+      return donutData.map(d => {
+        const len = (d.value / 100) * CIRC;
+        const seg = { ...d, dasharray: `${len.toFixed(2)} ${(CIRC - len).toFixed(2)}`, dashoffset: (-offset).toFixed(2) };
+        offset += len;
+        return seg;
+      });
+    })();
+
+    return {
+      pageTitle: '기초학력 위험 현황 및 영향요인 분석',
+      pageSubtitle: '경북 초·중·고 학생의 기초학력 미달 현황, 학생·학교·지역별 학습위험도와 주요 영향 요인을 진단합니다.',
+      regions, levels, onRegionChange: this.onRegionChange, onReset: this.onReset,
+      entityLabel,
+      filteredSchools, filteredCount: filteredSchools.length,
+      filterDesc,
+      kpiTotalStudents: totalStudents.toLocaleString(),
+      kpiAtRisk: totalAtRisk.toLocaleString(),
+      kpiRiskRate: riskRatePct.toFixed(1),
+      kpiPrevRate: prevRate.toFixed(1),
+      kpiYoyLabel: (avgYoy >= 0 ? '▲ ' : '▼ ') + Math.abs(avgYoy).toFixed(1),
+      kpiYoyColor: avgYoy >= 0 ? '#de3412' : '#228738',
+      donut, donutTotalLabel: studentCount.toLocaleString() + '명',
+      radarPoints, radarPolygonPoints, baselinePolygonPoints, radarAxes, radarRings, radarLabels,
+      trendSolidPath: toPath(solidPts),
+      trendDashedPath: showForecast ? toPath(forecastPts) : '',
+      trendPoints: pts2, trendYTicks,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
